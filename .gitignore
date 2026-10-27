@@ -1,0 +1,27 @@
+# Projects are separate git repos; materials are large downloaded files
+projects/*
+!projects/README.md
+materials/*
+!materials/.gitkeep
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# dbt
+target/
+dbt_packages/
+logs/
+profiles.yml
+preset-instructions.md
+
+# Airflow
+airflow.db
+*.log
+
+# Secrets and OS files
+.env
+*.pem
+.DS_Store

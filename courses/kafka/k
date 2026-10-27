@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Runs a Kafka CLI tool inside the kafka container, so course commands work without installing Kafka or Java on the Mac.
+#   ./k kafka-topics.sh --bootstrap-server localhost:9092 --list
+# Every file in bin/ is a link to this script named after a tool, so with bin/ on PATH the course commands work as typed:
+#   kafka-topics.sh --bootstrap-server localhost:9092 --list
+set -euo pipefail
+
+tool=$(basename "$0")
+if [ "$tool" = "k" ]; then
+  if [ $# -eq 0 ]; then
+    echo "usage: ./k <kafka-tool.sh> [args...]   e.g. ./k kafka-topics.sh --bootstrap-server localhost:9092 --list" >&2
+    exit 1
+  fi
+  tool=$1
+  shift
+fi
+
+# Docker already formats and starts the broker; running these lecture steps inside the container would break it.
+case "$tool" in
+  kafka-server-start.sh | kafka-server-stop.sh)
+    echo "Not needed here: Kafka runs in Docker. Start it with 'docker compose up -d', stop it with 'docker compose stop' (in ~/Developer/learning/courses/kafka)." >&2
+    exit 0 ;;
+  kafka-storage.sh)
+    if [ "${1:-}" = "format" ]; then
+      echo "Not needed here: the Docker image formats KRaft storage on first start, using CLUSTER_ID from docker-compose.yml." >&2
+      exit 0
+    fi ;;
+esac
+
+if ! docker ps --format '{{.Names}}' 2>/dev/null | grep -qx kafka; then
+  echo "Kafka is not running. Start it: cd ~/Developer/learning/courses/kafka && docker compose up -d" >&2
+  exit 1
+fi
+
+# Interactive tools (console producer/consumer) need a TTY; scripted calls must not request one.
+if [ -t 0 ]; then flags=(-it); else flags=(-i); fi
+exec docker exec "${flags[@]}" kafka "/opt/kafka/bin/$tool" "$@"

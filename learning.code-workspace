@@ -1,0 +1,15 @@
+{
+  // One VS Code window for all study work. Open with File > Open Workspace from File...
+  "folders": [
+    { "name": "kafka course", "path": "courses/kafka" },
+    { "name": "airflow course", "path": "courses/airflow" },
+    { "name": "dbt course", "path": "courses/dbt" },
+    { "name": "projects", "path": "projects" },
+    { "name": "notes", "path": "notes" },
+    { "name": "plan", "path": "../career_development/learning" }
+  ],
+  "settings": {
+    // Every file you open stays as its own tab instead of replacing the previous one.
+    "workbench.editor.enablePreview": false
+  }
+}
