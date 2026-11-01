@@ -1,0 +1,63 @@
+models:
+  - name: dim_listings_cleansed          # ① which model
+    description: Cleansed table which contains Airbnb listings.   # shows up in dbt docs
+    columns:
+
+     - name: listing_id                  # ② which column
+       description: Primary key for the listing
+       data_tests:                       # ③ tests on that column
+         - unique                        #    primary key: no duplicates...
+         - not_null                      #    ...and never empty
+
+     - name: host_id
+       description: The host's id. References the host table.
+       data_tests:
+         - not_null
+         - relationships:                # ④ foreign key check
+             arguments:
+               to: ref('dim_hosts_cleansed')   #    every host_id here...
+               field: host_id                  #    ...must exist in dim_hosts_cleansed.host_id
+
+     - name: room_type
+       description: Type of the apartment / room
+       data_tests:
+         - accepted_values:              # ⑤ only these 4 values allowed
+             arguments:
+               values: ['Entire home/apt',
+                        'Private room',
+                        'Shared room',
+                        'Hotel room']
+
+     - name: minimum_nights
+       description: '{{ doc("dim_listing_cleansed__minimum_nights") }}'   # long text lives in models/docs.md
+       data_tests:
+         - positive_value                # ⑥ our own generic test from macros/positive_value.sql
+
+  - name: fct_reviews                    # tests on the FACT table
+    description: One row per review (incremental).
+    columns:
+
+     - name: review_id
+       description: Surrogate key made by dbt_utils.generate_surrogate_key
+       data_tests:
+         - unique                        #    the key is the grain: one row per review, no duplicates
+         - not_null                      #    every review must get a key
+
+     - name: listing_id
+       description: The listing this review is about
+       data_tests:
+         - not_null
+         - relationships:                #    no "orphan" reviews: listing must exist
+             arguments:
+               to: ref('dim_listings_cleansed')
+               field: listing_id
+
+     - name: review_sentiment
+       data_tests:
+         - accepted_values:
+             arguments:
+               values: ['positive', 'neutral', 'negative']
+
+     - name: review_date
+       data_tests:
+         - not_null                      #    the incremental filter uses max(review_date), so NULLs would break it

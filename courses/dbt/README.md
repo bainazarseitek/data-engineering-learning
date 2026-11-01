@@ -28,3 +28,4 @@ dbt Cloud IDE details, the Semantic Layer and MetricFlow, dbt Mesh, Python model
 ## Progress
 | Date | Section | Notes |
 |---|---|---|
+| 2026-11-01 | Singular tests, Jinja/macros, custom generic tests, packages (dbt_utils), docs | `consistent_created_at`, `no_nulls_in_columns` macro, `positive_value` test, `review_id` surrogate key (needed `--full-refresh`), fct_reviews tests, `models/docs.md`. `dbt build`: 23/23 pass |

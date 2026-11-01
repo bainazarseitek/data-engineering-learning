@@ -1,0 +1,8 @@
+snapshots:
+  - name: scd_raw_listings                 # ① table name in Snowflake → AIRBNB.DEV.SCD_RAW_LISTINGS
+    relation: source('airbnb', 'listings') # ② WHAT to track: the RAW table, through source()
+    config:
+      unique_key: id                       # ③ how to recognise "the same row" across runs
+      strategy: timestamp                  # ④ how to detect "this row changed"
+      updated_at: updated_at               # ⑤ the column that strategy uses
+      hard_deletes: invalidate             # ⑥ what to do when a row disappears from the source
